@@ -66,7 +66,7 @@ var _ = Describe("Big Apps Helpers", func() {
 			bigFile, err := os.Stat(app.Location + "/payload")
 			Expect(err).To(BeNil())
 
-			Expect(bigFile.Size()).To(Equal(int64(5 * 1024 * 1024)))
+			Expect(bigFile.Size()).To(BeNumerically("==", 5*1024*1024))
 		})
 	})
 })

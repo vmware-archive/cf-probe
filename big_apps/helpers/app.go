@@ -15,9 +15,9 @@ func NewBigApp(runner command_runner.CommandRunner, appPath string, sizeInMegaby
 		return nil, err
 	}
 
-	cmd := exec.Command("cp", "-r", appPath+"/", tempDirName)
+	cmd := &exec.Cmd{Path: "cp", Args: []string{"-r", appPath + "/", tempDirName}}
 
-	err = cmd.Run()
+	err = runner.Run(cmd)
 	if err != nil {
 		return nil, err
 	}
@@ -25,9 +25,9 @@ func NewBigApp(runner command_runner.CommandRunner, appPath string, sizeInMegaby
 	ddOutputArg := "of=" + tempDirName + "/payload"
 	ddCountArg := fmt.Sprintf("count=%d", sizeInMegabytes)
 
-	cmd = exec.Command("dd", "if=/dev/urandom", ddOutputArg, ddCountArg, "bs=1048576")
+	cmd = &exec.Cmd{Path: "dd", Args: []string{"if=/dev/urandom", ddOutputArg, ddCountArg, "bs=1048576"}}
 
-	err = cmd.Run()
+	err = runner.Run(cmd)
 	if err != nil {
 		return nil, err
 	}
