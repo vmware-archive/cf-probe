@@ -9,6 +9,12 @@ import (
 	"github.com/pivotal-cf-experimental/cf-test-helpers/generator"
 )
 
+type BigApp struct {
+	Location string
+	runner   command_runner.CommandRunner
+	Name     string
+}
+
 func NewBigApp(runner command_runner.CommandRunner, appPath string, sizeInMegabytes int) (*BigApp, error) {
 	tempDirName, err := ioutil.TempDir("", "big-app")
 	if err != nil {
@@ -44,8 +50,18 @@ func (app *BigApp) Push() error {
 	return app.runner.Run(cmd)
 }
 
-type BigApp struct {
-	Location string
-	runner   command_runner.CommandRunner
-	Name     string
+func (app *BigApp) Cleanup() error {
+	cmd := &exec.Cmd{Path: "rm", Args: []string{"-r", app.Location}}
+	err := app.runner.Run(cmd)
+	if err != nil {
+		return err
+	}
+
+	cmd = &exec.Cmd{Path: "gcf", Args: []string{"delete", "-f", app.Name}}
+	err = app.runner.Run(cmd)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

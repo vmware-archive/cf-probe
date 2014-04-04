@@ -10,23 +10,17 @@ import (
 )
 
 var assetPath = flag.String("app-path", "../assets/big-app-base", "path to app")
+var lowLimit = flag.Int("low", 128, "lowest size to test")
+var highLimit = flag.Int("high", 1024, "highest size to test")
+var tolerance = flag.Int("tolerance", 4, "acceptable uncertainty in result")
 
 func main() {
 	flag.Parse()
 
 	runner := command_runner.New(true)
+	tester := helpers.NewAppSizeBinarySearchTester(runner, *assetPath)
 
-	app, err := helpers.NewBigApp(runner, *assetPath, 5)
-	if err != nil {
-		fmt.Printf("Creating app failed")
-		return
-	}
-
-	err = app.Push()
-	if err != nil {
-		fmt.Printf("App push failed")
-		return
-	}
-
+	value := helpers.BinarySearch(tester, *lowLimit, *highLimit, *tolerance)
+	fmt.Printf("The biggest app I was able to push was %dM", value)
 	return
 }

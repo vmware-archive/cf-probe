@@ -70,18 +70,21 @@ var _ = Describe("Big Apps Helpers", func() {
 	Describe("AppSizeBinarySearchTester", func() {
 
 		appPath := "app-path"
+		var runner *fake_command_runner.FakeCommandRunner
 
-		It("Returns true when it can successfully push an app", func() {
-			runner := fake_command_runner.New()
+		BeforeEach(func() {
+			runner = fake_command_runner.New()
+
+		})
+
+		It("returns true when it can successfully push an app", func() {
 
 			tester := NewAppSizeBinarySearchTester(runner, appPath)
 
 			Expect(tester.Test(100)).To(BeTrue())
 		})
 
-		It("Returns false when it can't push an app", func() {
-			runner := fake_command_runner.New()
-
+		It("returns false when it can't push an app", func() {
 			pushCommand := fake_command_runner.CommandSpec{Path: "gcf"}
 
 			runner.WhenRunning(pushCommand, func(cmd *exec.Cmd) error {
@@ -91,6 +94,25 @@ var _ = Describe("Big Apps Helpers", func() {
 			tester := NewAppSizeBinarySearchTester(runner, appPath)
 
 			Expect(tester.Test(100)).To(BeFalse())
+		})
+
+		It("cleans up the app when it's done", func() {
+			tester := NewAppSizeBinarySearchTester(runner, appPath)
+
+			gcfCommand := fake_command_runner.CommandSpec{Path: "gcf"}
+
+			ranGcfDelete := false
+
+			runner.WhenRunning(gcfCommand, func(cmd *exec.Cmd) error {
+				if len(cmd.Args) > 0 && cmd.Args[0] == "delete" {
+					ranGcfDelete = true
+				}
+				return nil
+			})
+
+			tester.Test(100)
+
+			Expect(ranGcfDelete).To(BeTrue())
 		})
 	})
 })

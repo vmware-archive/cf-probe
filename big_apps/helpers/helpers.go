@@ -33,7 +33,7 @@ func (tester *AppSizeBinarySearchTester) Test(value int) bool {
 		return false
 	}
 
-	// defer app.Cleanup()
+	defer app.Cleanup()
 	err = app.Push()
 	return err == nil
 }

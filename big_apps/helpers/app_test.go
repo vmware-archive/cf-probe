@@ -25,9 +25,9 @@ var _ = Describe("Big Apps Helpers", func() {
 
 			app.Push()
 
-			expected_command := fake_command_runner.CommandSpec{Path: "gcf", Args: []string{"push", app.Name, "-p", app.Location}}
+			expectedCommand := fake_command_runner.CommandSpec{Path: "gcf", Args: []string{"push", app.Name, "-p", app.Location}}
 
-			Expect(runner).To(HaveExecutedSerially(expected_command))
+			Expect(runner).To(HaveExecutedSerially(expectedCommand))
 		})
 	})
 
@@ -67,6 +67,36 @@ var _ = Describe("Big Apps Helpers", func() {
 			Expect(err).To(BeNil())
 
 			Expect(bigFile.Size()).To(BeNumerically("==", 5*1024*1024))
+		})
+	})
+
+	Describe("Cleanup", func() {
+		It("deletes the local copy of the app", func() {
+			runner := command_runner.New(false)
+			app, err := NewBigApp(runner, assetPath, 5)
+			Expect(err).To(BeNil())
+
+			fileInfo, err := os.Stat(app.Location)
+			Expect(err).To(BeNil())
+			Expect(fileInfo.IsDir()).To(BeTrue())
+
+			app.Cleanup()
+
+			fileInfo, err = os.Stat(app.Location)
+			Expect(err).NotTo(BeNil())
+		})
+
+		It("gcf deletes the app", func() {
+			runner := fake_command_runner.New()
+
+			app, err := NewBigApp(runner, assetPath, 5)
+			Expect(err).To(BeNil())
+
+			app.Cleanup()
+
+			expectedCommand := fake_command_runner.CommandSpec{Path: "gcf", Args: []string{"delete", "-f", app.Name}}
+
+			Expect(runner).To(HaveExecutedSerially(expectedCommand))
 		})
 	})
 })
