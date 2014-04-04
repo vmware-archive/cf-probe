@@ -1,69 +1,43 @@
 package helpers_test
 
 import (
+	// "errors"
+	// "os/exec"
+
 	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
+	// . "github.com/onsi/gomega"
 
-	. "github.com/pivotal-cf-experimental/cf-probe/big_apps/helpers"
+	// "github.com/cloudfoundry/gunk/command_runner/fake_command_runner"
 
-	"io/ioutil"
-	"os"
-
-	"github.com/cloudfoundry/gunk/command_runner"
-	"github.com/cloudfoundry/gunk/command_runner/fake_command_runner"
-	. "github.com/cloudfoundry/gunk/command_runner/fake_command_runner/matchers"
+	// . "github.com/pivotal-cf-experimental/cf-probe/big_apps/helpers"
 )
 
 var _ = Describe("Big Apps Helpers", func() {
-	Describe("PushApp", func() {
-		It("calls 'gcf push' with the app name and path", func() {
-			runner := fake_command_runner.New()
+	// Describe("PushBigApp", func() {
+	// 	It("returns true if the push succeeds", func() {
+	// 		runner := fake_command_runner.New()
 
-			PushApp(runner, "app-name", "app-path")
+	// 		success := PushBigApp(runner, "app-path", 0)
 
-			expected_command := fake_command_runner.CommandSpec{Path: "gcf", Args: []string{"push", "app-name", "-p", "app-path"}}
+	// 		Expect(success).To(BeTrue())
+	// 	})
 
-			Expect(runner).To(HaveExecutedSerially(expected_command))
-		})
-	})
+	// 	It("returns false if the push fails", func() {
+	// 		runner := fake_command_runner.New()
 
-	Describe("MakeBigApp", func() {
-		assetPath := "../../assets/big-app-base"
-		var location string
+	// 		pushCommand := fake_command_runner.CommandSpec{Path: "gcf"}
 
-		BeforeEach(func() {
-			runner := command_runner.New(false)
+	// 		runner.WhenRunning(pushCommand, func(cmd *exec.Cmd) error {
+	// 			return errors.New("PUSH FAILED")
+	// 		})
 
-			var err error
-			location, err = MakeBigApp(runner, assetPath, 5)
-			Expect(err).To(BeNil())
-		})
+	// 		success := PushBigApp(runner, "app-path", 0)
 
-		AfterEach(func() {
-			err := os.RemoveAll(location)
-			Expect(err).To(BeNil())
-		})
+	// 		Expect(success).To(BeFalse())
+	// 	})
 
-		It("copies the app asset", func() {
-			files, err := ioutil.ReadDir(location)
-			Expect(err).To(BeNil())
+	// 	It("Pushes big files with the app", func() {
 
-			fileNames := []string{}
-			for _, fileInfo := range files {
-				fileNames = append(fileNames, fileInfo.Name())
-			}
-
-			Expect(fileNames).To(ContainElement("Gemfile"))
-			Expect(fileNames).To(ContainElement("vendor"))
-			Expect(fileNames).To(ContainElement("Gemfile.lock"))
-			Expect(fileNames).To(ContainElement("config.ru"))
-		})
-
-		It("adds a file of the given number of megabytes", func() {
-			bigFile, err := os.Stat(location + "/payload")
-			Expect(err).To(BeNil())
-
-			Expect(bigFile.Size()).To(Equal(int64(5 * 1024 * 1024)))
-		})
-	})
+	// 	})
+	// })
 })

@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	"os"
+	// "os"
 
 	"github.com/cloudfoundry/gunk/command_runner"
 	"github.com/pivotal-cf-experimental/cf-probe/big_apps/helpers"
@@ -16,15 +16,17 @@ func main() {
 
 	runner := command_runner.New(true)
 
-	appPath, err := helpers.MakeBigApp(runner, *assetPath, 1)
+	app, err := helpers.NewBigApp(runner, *assetPath, 5)
 	if err != nil {
-		fmt.Printf("Making big app failed: %s", err.Error())
+		fmt.Printf("Creating app failed")
+		return
 	}
 
-	defer os.RemoveAll(appPath)
-
-	err = helpers.PushApp(runner, "big-app", appPath)
+	err = app.Push()
 	if err != nil {
-		fmt.Printf("Push failed: %s", err.Error())
+		fmt.Printf("App push failed")
+		return
 	}
+
+	return
 }
